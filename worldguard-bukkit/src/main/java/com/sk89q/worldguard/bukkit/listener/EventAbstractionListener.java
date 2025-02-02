@@ -925,7 +925,10 @@ public class EventAbstractionListener extends AbstractListener {
                 // show as lit on the client consistently
                 return;
             }
-            Events.fireToCancel(event, new DamageEntityEvent(event, create(((EntityCombustByEntityEvent) event).getCombuster()), event.getEntity()));
+            event.getEntity().getScheduler().run(getPlugin(), scheduledTask -> {
+                Cause cause = create(((EntityCombustByEntityEvent) event).getCombuster());
+                Events.fireToCancel(event, new DamageEntityEvent(event, cause, event.getEntity()));
+            }, null);
         }
     }
 
@@ -967,7 +970,8 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onVehicleDamage(VehicleDamageEvent event) {
         Entity attacker = event.getAttacker();
-        Events.fireToCancel(event, new DamageEntityEvent(event, create(attacker), event.getVehicle()));
+        if (attacker == null) return;
+        attacker.getScheduler().run(getPlugin(), scheduledTask -> Events.fireToCancel(event, new DamageEntityEvent(event, create(attacker), event.getVehicle())), null);
     }
 
     //-------------------------------------------------------------------------
