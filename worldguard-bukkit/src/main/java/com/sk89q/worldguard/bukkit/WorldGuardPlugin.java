@@ -266,8 +266,8 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        WorldGuard.getInstance().disable();
         this.cancelTasks();
+        WorldGuard.getInstance().disable();
     }
 
     @Override
