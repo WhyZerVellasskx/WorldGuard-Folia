@@ -107,6 +107,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     private static BukkitWorldGuardPlatform platform;
     private final CommandsManager<Actor> commands;
     private PlayerMoveListener playerMoveListener;
+    public static java.util.concurrent.CopyOnWriteArrayList<io.papermc.paper.threadedregions.scheduler.ScheduledTask> scheduledTaskList = new java.util.concurrent.CopyOnWriteArrayList<>();
 
     private static final int BSTATS_PLUGIN_ID = 3283;
 
@@ -163,7 +164,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             reg.register(GeneralCommands.class);
         }
 
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
+        scheduledTaskList.add(getServer().getGlobalRegionScheduler().runAtFixedRate(this, scheduledTask -> sessionManager.run(), BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY));
 
         // Register events
         getServer().getPluginManager().registerEvents(sessionManager, this);
@@ -204,18 +205,20 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-        Bukkit.getScheduler().runTask(this, () -> {
+        //Bukkit.getScheduler().runTask(this, () -> {
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                ProcessPlayerEvent event = new ProcessPlayerEvent(player);
-                Events.fire(event);
+                player.getScheduler().run(this, scheduledTask -> {
+                    ProcessPlayerEvent event = new ProcessPlayerEvent(player);
+                    Events.fire(event);
+                }, null);
             }
-        });
+        //});
 
         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
 
         // Enable metrics
         final Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID); // bStats plugin id
-        if (platform.getGlobalStateManager().extraStats) {
+        if (false && platform.getGlobalStateManager().extraStats) {
             setupCustomCharts(metrics);
         }
     }
@@ -264,7 +267,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         WorldGuard.getInstance().disable();
-        this.getServer().getScheduler().cancelTasks(this);
+        this.cancelTasks();
     }
 
     @Override
@@ -522,6 +525,16 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     public PlayerMoveListener getPlayerMoveListener() {
         return playerMoveListener;
+    }
+
+    private void cancelTasks() {
+        for (io.papermc.paper.threadedregions.scheduler.ScheduledTask scheduledTask : scheduledTaskList) {
+            if (!scheduledTask.isCancelled()) {
+                scheduledTask.cancel();
+            }
+        }
+        this.getServer().getAsyncScheduler().cancelTasks(this);
+        this.getServer().getGlobalRegionScheduler().cancelTasks(this);
     }
 
 }
