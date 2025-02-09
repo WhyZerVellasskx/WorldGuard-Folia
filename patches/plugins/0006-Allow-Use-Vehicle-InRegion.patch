@@ -1,0 +1,21 @@
+Subject: [PATCH] Allow use vehicle in region
+---
+Index: worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/RegionProtectionListener.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/RegionProtectionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/RegionProtectionListener.java
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/RegionProtectionListener.java	(revision 38ce4d42fc4adf198d0495e93f626b5b609147d4)
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/RegionProtectionListener.java	(revision 955dbf71e2d1a7159ecdcb8d56fee499c99699d9)
+@@ -433,6 +433,10 @@
+             // bukkit actually gives three events in this case - in order: PlayerInteractAtEntity, VehicleEnter, EntityMount
+             canUse = true;
+             what = "ride that";
++
++        } else if (Entities.isMinecart(entity.getType())) {
++            canUse = true;
++            what = "use that";
+         /* Everything else */
+         } else {
+             canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT));

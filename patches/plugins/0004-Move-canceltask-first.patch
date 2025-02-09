@@ -1,0 +1,26 @@
+From 3de4116f51b9be0182adf909005cc24d12d60ea7 Mon Sep 17 00:00:00 2001
+From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
+Date: Sun, 2 Feb 2025 13:25:18 +0100
+Subject: [PATCH 4/5] Move canceltask first
+
+---
+ .../main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
+index 8d6a7fe9..f2a70a3b 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
+@@ -266,8 +266,8 @@ private void setupCustomCharts(Metrics metrics) {
+ 
+     @Override
+     public void onDisable() {
+-        WorldGuard.getInstance().disable();
+         this.cancelTasks();
++        WorldGuard.getInstance().disable();
+     }
+ 
+     @Override
+-- 
+2.47.1.windows.2
+

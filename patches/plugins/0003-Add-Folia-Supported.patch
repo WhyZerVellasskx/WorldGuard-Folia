@@ -1,0 +1,21 @@
+From 04068b645635a4b141caeddb6c916904c28022c5 Mon Sep 17 00:00:00 2001
+From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
+Date: Sun, 2 Feb 2025 13:25:18 +0100
+Subject: [PATCH 3/5] Add Folia Supported
+
+---
+ worldguard-bukkit/src/main/resources/plugin.yml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/worldguard-bukkit/src/main/resources/plugin.yml b/worldguard-bukkit/src/main/resources/plugin.yml
+index bccbfe3b..95bb45bc 100644
+--- a/worldguard-bukkit/src/main/resources/plugin.yml
++++ b/worldguard-bukkit/src/main/resources/plugin.yml
+@@ -4,3 +4,4 @@ version: "${internalVersion}"
+ depend: [WorldEdit]
+ softdepend: [CommandBook]
+ api-version: "1.21"
++folia-supported: true
+-- 
+2.47.1.windows.2
+

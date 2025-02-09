@@ -1,0 +1,38 @@
+From 75ac3f67df6ec1cacf81e65786f46e30099170b2 Mon Sep 17 00:00:00 2001
+From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
+Date: Sun, 2 Feb 2025 13:25:18 +0100
+Subject: [PATCH 5/5] Test EntityCombustByEntityEvent
+
+---
+ .../bukkit/listener/EventAbstractionListener.java         | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
+index f1b72223..7e84d717 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
+@@ -925,7 +925,10 @@ public void onEntityCombust(EntityCombustEvent event) {
+                 // show as lit on the client consistently
+                 return;
+             }
+-            Events.fireToCancel(event, new DamageEntityEvent(event, create(((EntityCombustByEntityEvent) event).getCombuster()), event.getEntity()));
++            event.getEntity().getScheduler().run(getPlugin(), scheduledTask -> {
++                Cause cause = create(((EntityCombustByEntityEvent) event).getCombuster());
++                Events.fireToCancel(event, new DamageEntityEvent(event, cause, event.getEntity()));
++            }, null);
+         }
+     }
+ 
+@@ -967,7 +970,8 @@ public void onPlayerDropItem(PlayerDropItemEvent event) {
+     @EventHandler(ignoreCancelled = true)
+     public void onVehicleDamage(VehicleDamageEvent event) {
+         Entity attacker = event.getAttacker();
+-        Events.fireToCancel(event, new DamageEntityEvent(event, create(attacker), event.getVehicle()));
++        if (attacker == null) return;
++        attacker.getScheduler().run(getPlugin(), scheduledTask -> Events.fireToCancel(event, new DamageEntityEvent(event, create(attacker), event.getVehicle())), null);
+     }
+ 
+     //-------------------------------------------------------------------------
+-- 
+2.47.1.windows.2
+

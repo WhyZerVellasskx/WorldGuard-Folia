@@ -1,0 +1,200 @@
+From e11caabaf34b73253628c1950e284a11fa57d88f Mon Sep 17 00:00:00 2001
+From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
+Date: Sun, 2 Feb 2025 13:25:17 +0100
+Subject: [PATCH 1/5] Replace Scheduler Bukkit to Folia
+
+---
+ .../bukkit/BukkitRegionContainer.java         |  2 +-
+ .../worldguard/bukkit/WorldGuardPlugin.java   | 27 ++++++++++++++-----
+ .../listener/EventAbstractionListener.java    |  4 +--
+ .../bukkit/listener/PlayerMoveListener.java   |  2 +-
+ .../bukkit/session/BukkitSessionManager.java  | 18 ++++++++-----
+ .../bukkit/util/report/SchedulerReport.java   | 12 ++++-----
+ 6 files changed, 41 insertions(+), 24 deletions(-)
+
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/BukkitRegionContainer.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/BukkitRegionContainer.java
+index 79d7b344..3ecd1724 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/BukkitRegionContainer.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/BukkitRegionContainer.java
+@@ -94,7 +94,7 @@ public void onChunkUnload(ChunkUnloadEvent event) {
+             }
+         }, plugin);
+ 
+-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, cache::invalidateAll, CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
++        WorldGuardPlugin.scheduledTaskList.add(Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, scheduledTask -> cache.invalidateAll(), CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL));
+     }
+ 
+     public void shutdown() {
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
+index 86aefb55..8d6a7fe9 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
+@@ -107,6 +107,7 @@ public class WorldGuardPlugin extends JavaPlugin {
+     private static BukkitWorldGuardPlatform platform;
+     private final CommandsManager<Actor> commands;
+     private PlayerMoveListener playerMoveListener;
++    public static java.util.concurrent.CopyOnWriteArrayList<io.papermc.paper.threadedregions.scheduler.ScheduledTask> scheduledTaskList = new java.util.concurrent.CopyOnWriteArrayList<>();
+ 
+     private static final int BSTATS_PLUGIN_ID = 3283;
+ 
+@@ -163,7 +164,7 @@ public void onEnable() {
+             reg.register(GeneralCommands.class);
+         }
+ 
+-        getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
++        scheduledTaskList.add(getServer().getGlobalRegionScheduler().runAtFixedRate(this, scheduledTask -> sessionManager.run(), BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY));
+ 
+         // Register events
+         getServer().getPluginManager().registerEvents(sessionManager, this);
+@@ -204,18 +205,20 @@ public void onEnable() {
+         }
+         worldListener.registerEvents();
+ 
+-        Bukkit.getScheduler().runTask(this, () -> {
++        //Bukkit.getScheduler().runTask(this, () -> {
+             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+-                ProcessPlayerEvent event = new ProcessPlayerEvent(player);
+-                Events.fire(event);
++                player.getScheduler().run(this, scheduledTask -> {
++                    ProcessPlayerEvent event = new ProcessPlayerEvent(player);
++                    Events.fire(event);
++                }, null);
+             }
+-        });
++        //});
+ 
+         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
+ 
+         // Enable metrics
+         final Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID); // bStats plugin id
+-        if (platform.getGlobalStateManager().extraStats) {
++        if (false && platform.getGlobalStateManager().extraStats) {
+             setupCustomCharts(metrics);
+         }
+     }
+@@ -264,7 +267,7 @@ private void setupCustomCharts(Metrics metrics) {
+     @Override
+     public void onDisable() {
+         WorldGuard.getInstance().disable();
+-        this.getServer().getScheduler().cancelTasks(this);
++        this.cancelTasks();
+     }
+ 
+     @Override
+@@ -524,4 +527,14 @@ public PlayerMoveListener getPlayerMoveListener() {
+         return playerMoveListener;
+     }
+ 
++    private void cancelTasks() {
++        for (io.papermc.paper.threadedregions.scheduler.ScheduledTask scheduledTask : scheduledTaskList) {
++            if (!scheduledTask.isCancelled()) {
++                scheduledTask.cancel();
++            }
++        }
++        this.getServer().getAsyncScheduler().cancelTasks(this);
++        this.getServer().getGlobalRegionScheduler().cancelTasks(this);
++    }
++
+ }
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
+index c1e9876d..f1b72223 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
+@@ -1022,8 +1022,8 @@ public void onInventoryMoveItem(InventoryMoveItemEvent event) {
+ 
+             handleInventoryHolderUse(event, cause, targetHolder);
+ 
+-            if (event.isCancelled() && causeHolder instanceof Hopper && wcfg.breakDeniedHoppers) {
+-                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
++            if (event.isCancelled() && causeHolder instanceof Hopper hopper && wcfg.breakDeniedHoppers) {
++                Bukkit.getRegionScheduler().execute(getPlugin(), hopper.getLocation(),
+                         () -> ((Hopper) causeHolder).getBlock().breakNaturally());
+             } else {
+                 entry.setCancelled(event.isCancelled());
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/PlayerMoveListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/PlayerMoveListener.java
+index 7b95a574..83d73366 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/PlayerMoveListener.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/PlayerMoveListener.java
+@@ -127,7 +127,7 @@ public void onPlayerMove(PlayerMoveEvent event) {
+ 
+                 player.teleport(override.clone().add(0, 1, 0));
+ 
+-                Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleport(override.clone().add(0, 1, 0)), 1);
++                player.getScheduler().runDelayed(getPlugin(), (scheduledTask) -> player.teleport(override.clone().add(0, 1, 0)), null, 1);
+             }
+         }
+     }
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/session/BukkitSessionManager.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/session/BukkitSessionManager.java
+index df589cbc..696c2d2a 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/session/BukkitSessionManager.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/session/BukkitSessionManager.java
+@@ -49,11 +49,13 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
+     public void resetAllStates() {
+         Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
+         for (Player player : players) {
+-            BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
+-            Session session = getIfPresent(bukkitPlayer);
+-            if (session != null) {
+-                session.resetState(bukkitPlayer);
+-            }
++            player.getScheduler().run(WorldGuardPlugin.inst(), scheduledTask -> {
++                BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
++                Session session = getIfPresent(bukkitPlayer);
++                if (session != null) {
++                    session.resetState(bukkitPlayer);
++                }
++            }, null);
+         }
+     }
+ 
+@@ -67,8 +69,10 @@ public void onPlayerProcess(ProcessPlayerEvent event) {
+     @Override
+     public void run() {
+         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+-            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+-            get(localPlayer).tick(localPlayer);
++            player.getScheduler().run(WorldGuardPlugin.inst(), scheduledTask -> {
++                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
++                get(localPlayer).tick(localPlayer);
++            }, null);
+         }
+     }
+ 
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java
+index d897162c..ccf7e463 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java
+@@ -52,24 +52,24 @@ public Optional<Field> load(Class<?> clazz) throws Exception {
+     public SchedulerReport() {
+         super("Scheduler");
+ 
+-        List<BukkitTask> tasks = Bukkit.getServer().getScheduler().getPendingTasks();
++        List<io.papermc.paper.threadedregions.scheduler.ScheduledTask> tasks = com.sk89q.worldguard.bukkit.WorldGuardPlugin.scheduledTaskList;
+ 
+         append("Pending Task Count", tasks.size());
+ 
+-        for (BukkitTask task : tasks) {
++        for (io.papermc.paper.threadedregions.scheduler.ScheduledTask task : tasks) {
+             Class<?> taskClass = getTaskClass(task);
+ 
+-            DataReport report = new DataReport("Task: #" + task.getTaskId());
+-            report.append("Owner", task.getOwner().getName());
++            DataReport report = new DataReport("Task: #" + task.getOwningPlugin());
++            report.append("Owner", task.getOwningPlugin().getName());
+             report.append("Runnable", taskClass != null ? taskClass.getName() : "<Unknown>");
+-            report.append("Synchronous?", task.isSync());
++            //report.append("Synchronous?", task.isSync());
+             append(report.getTitle(), report);
+         }
+     }
+ 
+     @SuppressWarnings("unchecked")
+     @Nullable
+-    private Class<?> getTaskClass(BukkitTask task) {
++    private Class<?> getTaskClass(io.papermc.paper.threadedregions.scheduler.ScheduledTask task) {
+         try {
+             Class<?> clazz = task.getClass();
+             Set<Class<?>> classes = (Set) TypeToken.of(clazz).getTypes().rawTypes();
+-- 
+2.47.1.windows.2
+
