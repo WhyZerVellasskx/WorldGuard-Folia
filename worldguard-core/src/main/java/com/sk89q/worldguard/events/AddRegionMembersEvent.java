@@ -29,9 +29,9 @@ public class AddRegionMembersEvent {
 
     private final RegionManager regionManager;
 
-    public AddRegionMembersEvent(ProtectedRegion region, DefaultDomain members, RegionManager regionManager){
-        this.region    = region;
-        this.members    = members;
+    public AddRegionMembersEvent(ProtectedRegion region, DefaultDomain members, RegionManager regionManager) {
+        this.region = region;
+        this.members = members;
         this.regionManager = regionManager;
     }
 

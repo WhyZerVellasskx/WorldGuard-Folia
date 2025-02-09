@@ -25,12 +25,13 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 public class NewRegionEvent {
     private final ProtectedRegion region;
     private final RegionManager regionManager;
-    public NewRegionEvent(final ProtectedRegion region, RegionManager regionManager){
+
+    public NewRegionEvent(final ProtectedRegion region, RegionManager regionManager) {
         this.region = region;
         this.regionManager = regionManager;
     }
 
-    public ProtectedRegion getRegion(){
+    public ProtectedRegion getRegion() {
         return this.region;
     }
 

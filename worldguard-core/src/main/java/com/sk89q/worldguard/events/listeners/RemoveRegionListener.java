@@ -25,5 +25,5 @@ import com.sk89q.worldguard.events.RemoveRegionEvent;
  * Remove region event listener
  */
 public interface RemoveRegionListener {
-    void accept(RemoveRegionEvent e);
+    void accept(RemoveRegionEvent event);
 }

@@ -25,5 +25,5 @@ import com.sk89q.worldguard.events.NewRegionEvent;
  * Create new region event listener
  */
 public interface CreateRegionListener{
-    void accept(NewRegionEvent e);
+    void accept(NewRegionEvent event);
 }

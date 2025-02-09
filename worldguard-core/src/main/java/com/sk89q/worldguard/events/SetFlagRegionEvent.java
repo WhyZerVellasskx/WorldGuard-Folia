@@ -32,10 +32,10 @@ public class SetFlagRegionEvent {
     private final RegionManager regionManager;
 
 
-    public SetFlagRegionEvent(final ProtectedRegion region, String flagName, @Nullable String value, RegionManager regionManager){
-        this.region   = region;
+    public SetFlagRegionEvent(final ProtectedRegion region, String flagName, @Nullable String value, RegionManager regionManager) {
+        this.region = region;
         this.flagName = flagName;
-        this.value    = value;
+        this.value = value;
         this.regionManager = regionManager;
     }
 
@@ -51,7 +51,7 @@ public class SetFlagRegionEvent {
         return value;
     }
 
-    public ProtectedRegion getRegion(){
+    public ProtectedRegion getRegion() {
         return this.region;
     }
 }

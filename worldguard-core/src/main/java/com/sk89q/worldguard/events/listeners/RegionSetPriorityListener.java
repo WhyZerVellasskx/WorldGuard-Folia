@@ -22,5 +22,5 @@ package com.sk89q.worldguard.events.listeners;
 import com.sk89q.worldguard.events.RegionSetPriorityEvent;
 
 public interface RegionSetPriorityListener {
-    void accept(RegionSetPriorityEvent e);
+    void accept(RegionSetPriorityEvent event);
 }

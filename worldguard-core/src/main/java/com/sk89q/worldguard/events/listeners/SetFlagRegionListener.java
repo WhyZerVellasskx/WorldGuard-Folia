@@ -26,5 +26,5 @@ import com.sk89q.worldguard.events.SetFlagRegionEvent;
  * Set region flag event listener
  */
 public interface SetFlagRegionListener {
-    void accept(SetFlagRegionEvent e);
+    void accept(SetFlagRegionEvent event);
 }

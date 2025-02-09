@@ -49,7 +49,7 @@ import javax.annotation.Nullable;
  * against it.
  *
  * <p>Instances can be modified and access from several threads at a time.</p>
- *
+ * <p>
  * Note: this class has a natural ordering that is inconsistent with equals.
  * Regions with identical ids (and also the same priority) may exist in different managers (or no manager at all),
  * so care should be taken when comparing regions that have not been obtained from a single manager.
@@ -75,7 +75,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     /**
      * Construct a new instance of this region.
      *
-     * @param id the name of this region
+     * @param id              the name of this region
      * @param transientRegion whether this region should only be kept in memory and not be saved
      * @throws IllegalArgumentException thrown if the ID is invalid (see {@link #isValidId(String)}
      */
@@ -178,12 +178,13 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         setDirty(true);
         this.priority = priority;
 
-        if (callEvent && regionManager != null ){
-            WorldGuard.getInstance().getEventManager().call(new RegionSetPriorityEvent(this,priority,this.regionManager));
+        if (callEvent && regionManager != null) {
+            WorldGuard.getInstance().getEventManager().call(new RegionSetPriorityEvent(this, priority, this.regionManager));
         }
     }
-    public void setPriority(int priority){
-        setPriority(priority,true);
+
+    public void setPriority(int priority) {
+        setPriority(priority, true);
     }
 
     /**
@@ -234,28 +235,30 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         this.parent = null;
     }
 
-    public void addOwners(DefaultDomain owners){
-        addOwners(owners,true);
+    public void addOwners(DefaultDomain owners) {
+        addOwners(owners, true);
     }
-    public void addOwners(DefaultDomain owners, boolean callEvent){
+
+    public void addOwners(DefaultDomain owners, boolean callEvent) {
         this.getOwners().addAll(owners);
 
-        if (callEvent  && regionManager != null){
+        if (callEvent && regionManager != null) {
             WorldGuard.getInstance().getEventManager()
-                    .call(new AddRegionOwnersEvent(this,owners,this.regionManager));
+                    .call(new AddRegionOwnersEvent(this, owners, this.regionManager));
         }
     }
 
-    public void removeOwners(DefaultDomain owners){
-        removeOwners(owners,true);
+    public void removeOwners(DefaultDomain owners) {
+        removeOwners(owners, true);
     }
-    public void removeOwners(DefaultDomain owners, boolean callEvent){
+
+    public void removeOwners(DefaultDomain owners, boolean callEvent) {
         this.getOwners().removeAll(owners);
 
         //call event
-        if (callEvent  && regionManager != null)
+        if (callEvent && regionManager != null)
             WorldGuard.getInstance().getEventManager()
-                    .call(new RemoveRegionOwnersEvent(this,owners,this.regionManager));
+                    .call(new RemoveRegionOwnersEvent(this, owners, this.regionManager));
     }
 
 
@@ -288,26 +291,29 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     public DefaultDomain getMembers() {
         return members;
     }
+
     public void removeMembers(DefaultDomain members) {
-        removeMembers(members,true);
+        removeMembers(members, true);
     }
-    public void removeMembers(DefaultDomain members, boolean callEvent){
+
+    public void removeMembers(DefaultDomain members, boolean callEvent) {
         this.getMembers().removeAll(members);
 
         if (callEvent && regionManager != null)
             WorldGuard.getInstance().getEventManager()
-                    .call(new RemoveRegionMembersEvent(this,members,this.regionManager));
+                    .call(new RemoveRegionMembersEvent(this, members, this.regionManager));
     }
 
-    public void addMembers(DefaultDomain members){
-        addMembers(members,true);
+    public void addMembers(DefaultDomain members) {
+        addMembers(members, true);
     }
-    public void addMembers(DefaultDomain members, boolean callEvent){
+
+    public void addMembers(DefaultDomain members, boolean callEvent) {
         this.getMembers().addAll(members);
 
-        if (callEvent && regionManager != null )
+        if (callEvent && regionManager != null)
             WorldGuard.getInstance().getEventManager()
-                    .call(new AddRegionMembersEvent(this,members,this.regionManager));
+                    .call(new AddRegionMembersEvent(this, members, this.regionManager));
     }
 
     /**
@@ -460,9 +466,9 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * Get a flag's value.
      *
      * @param flag the flag to check
+     * @param <T>  the flag type
+     * @param <V>  the type of the flag's value
      * @return the value or null if isn't defined
-     * @param <T> the flag type
-     * @param <V> the type of the flag's value
      */
     @SuppressWarnings("unchecked")
     @Nullable
@@ -481,18 +487,18 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         return val;
     }
 
-    public void setRegionManager(RegionManager regionManager){
+    public void setRegionManager(RegionManager regionManager) {
         this.regionManager = regionManager;
     }
-    /**
 
     /**
+     * /**
      * Set a flag's value.
      *
      * @param flag the flag to check
-     * @param val the value to set
-     * @param <T> the flag type
-     * @param <V> the type of the flag's value
+     * @param val  the value to set
+     * @param <T>  the flag type
+     * @param <V>  the type of the flag's value
      */
     public <T extends Flag<V>, V> void setFlag(T flag, @Nullable V val, boolean callEvent) {
         checkNotNull(flag);
@@ -504,22 +510,21 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         }
 
         //call event
-        if (callEvent && regionManager != null ){
+        if (callEvent && regionManager != null) {
             String value;
-            if (val != null && (val.toString().equals("DENY") || val.toString().equals("ALLOW"))){
+            if (val != null && (val.toString().equals("DENY") || val.toString().equals("ALLOW"))) {
                 value = val.toString();
-            }else {
+            } else {
                 value = "none";
             }
-            WorldGuard.getInstance().getEventManager().call(new SetFlagRegionEvent(this,flag.getName(),value,this.regionManager));
+            WorldGuard.getInstance().getEventManager().call(new SetFlagRegionEvent(this, flag.getName(), value, this.regionManager));
         }
-
 
 
     }
 
     public <T extends Flag<V>, V> void setFlag(T flag, @Nullable V val) {
-        setFlag(flag,val,true);
+        setFlag(flag, val, true);
     }
 
     /**
@@ -661,7 +666,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     /**
      * Test whether the given region intersects with this area.
      *
-     * @param region the region to test
+     * @param region   the region to test
      * @param thisArea an area object for this region
      * @return true if the two regions intersect
      */
@@ -779,7 +784,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return id.hashCode();
     }
 

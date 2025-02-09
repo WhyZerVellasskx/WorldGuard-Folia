@@ -25,5 +25,5 @@ import com.sk89q.worldguard.events.AddRegionMembersEvent;
  * Add region members event listener
  */
 public interface AddRegionMembersListener {
-    void accept(AddRegionMembersEvent e);
+    void accept(AddRegionMembersEvent event);
 }

@@ -66,7 +66,7 @@ public final class RegionManager {
     /**
      * Create a new index.
      *
-     * @param store the region store
+     * @param store        the region store
      * @param indexFactory the factory for creating new instances of the index
      * @param flagRegistry the flag registry
      */
@@ -220,9 +220,10 @@ public final class RegionManager {
     public void setRegions(Collection<ProtectedRegion> regions) {
         checkNotNull(regions);
 
-        for (ProtectedRegion pr: regions){
+        for (ProtectedRegion pr : regions) {
             pr.setRegionManager(this);
         }
+
         ConcurrentRegionIndex newIndex = indexFactory.apply(getName());
         newIndex.addAll(regions);
         newIndex.getAndClearDifference(); // Clear changes
@@ -239,10 +240,11 @@ public final class RegionManager {
     public void addRegion(ProtectedRegion region, boolean callEvent) {
         checkNotNull(region);
         index.add(region);
-        if (callEvent) WorldGuard.getInstance().getEventManager().call(new NewRegionEvent(region,this));
+        if (callEvent) WorldGuard.getInstance().getEventManager().call(new NewRegionEvent(region, this));
     }
+
     public void addRegion(ProtectedRegion region) {
-        addRegion(region,true);
+        addRegion(region, true);
     }
 
     /**
@@ -280,7 +282,7 @@ public final class RegionManager {
 
     @Nullable
     public Set<ProtectedRegion> removeRegion(String id) {
-        return removeRegion(id, RemovalStrategy.REMOVE_CHILDREN,true);
+        return removeRegion(id, RemovalStrategy.REMOVE_CHILDREN, true);
     }
 
     /**
@@ -291,14 +293,15 @@ public final class RegionManager {
      * @return a list of removed regions where the first entry is the region specified by {@code id}
      */
     @Nullable
-    public Set<ProtectedRegion> removeRegion(String id, RemovalStrategy strategy){
-        return removeRegion(id,strategy,true);
+    public Set<ProtectedRegion> removeRegion(String id, RemovalStrategy strategy) {
+        return removeRegion(id, strategy, true);
     }
+
     /**
      * Remove a region from the index with the given name.
      *
-     * @param id the name of the region
-     * @param strategy what to do with children
+     * @param id        the name of the region
+     * @param strategy  what to do with children
      * @param callEvent call event?
      * @return a list of removed regions where the first entry is the region specified by {@code id}
      */
@@ -308,7 +311,7 @@ public final class RegionManager {
 
         //call event
         if (callEvent)
-            WorldGuard.getInstance().getEventManager().call(new RemoveRegionEvent(regionSet,this));
+            WorldGuard.getInstance().getEventManager().call(new RemoveRegionEvent(regionSet, this));
         return regionSet;
     }
 
@@ -328,7 +331,7 @@ public final class RegionManager {
      * Return a region set for the given position.
      *
      * @param position the position
-     * @param option the option
+     * @param option   the option
      * @return a region set
      */
     public ApplicableRegionSet getApplicableRegions(BlockVector3 position, QueryOption option) {

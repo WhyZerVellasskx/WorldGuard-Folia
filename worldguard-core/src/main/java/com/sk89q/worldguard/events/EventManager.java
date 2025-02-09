@@ -35,67 +35,83 @@ public class EventManager {
     private final ArrayList<RemoveRegionOwnersListener> removeRegionOwnersListeners = new ArrayList<>();
     private final ArrayList<RemoveRegionMembersListener> removeRegionMembersListeners = new ArrayList<>();
     private final ArrayList<RegionSetPriorityListener> regionSetPriorityListeners = new ArrayList<>();
-    public void registerListener(CreateRegionListener listener){
+
+    public void registerListener(CreateRegionListener listener) {
         createRegionEventListeners.add(listener);
     }
-    public void registerListener(RemoveRegionListener listener){
+
+    public void registerListener(RemoveRegionListener listener) {
         removeRegionListeners.add(listener);
     }
-    public void registerListener(SetFlagRegionListener listener){
+
+    public void registerListener(SetFlagRegionListener listener) {
         setFlagRegionListeners.add(listener);
     }
-    public void registerListener(AddRegionOwnersListener listener){
+
+    public void registerListener(AddRegionOwnersListener listener) {
         addRegionOwnerListeners.add(listener);
     }
-    public void registerListener(AddRegionMembersListener listener){
+
+    public void registerListener(AddRegionMembersListener listener) {
         addRegionMembersListeners.add(listener);
     }
-    public void registerListener(RemoveRegionOwnersListener listener){
+
+    public void registerListener(RemoveRegionOwnersListener listener) {
         removeRegionOwnersListeners.add(listener);
     }
-    public void registerListener(RemoveRegionMembersListener listener){
+
+    public void registerListener(RemoveRegionMembersListener listener) {
         removeRegionMembersListeners.add(listener);
     }
-    public void registerListener(RegionSetPriorityListener listener){
+
+    public void registerListener(RegionSetPriorityListener listener) {
         regionSetPriorityListeners.add(listener);
     }
-    public void call(NewRegionEvent e){
-        for (CreateRegionListener listener: createRegionEventListeners){
+
+    public void call(NewRegionEvent e) {
+        for (CreateRegionListener listener : createRegionEventListeners) {
             listener.accept(e);
         }
     }
-    public void call(RegionSetPriorityEvent e){
-        for (RegionSetPriorityListener listener: regionSetPriorityListeners){
+
+    public void call(RegionSetPriorityEvent e) {
+        for (RegionSetPriorityListener listener : regionSetPriorityListeners) {
             listener.accept(e);
         }
     }
-    public void call(SetFlagRegionEvent e){
-        for (SetFlagRegionListener listener: setFlagRegionListeners){
+
+    public void call(SetFlagRegionEvent e) {
+        for (SetFlagRegionListener listener : setFlagRegionListeners) {
             listener.accept(e);
         }
     }
-    public void call(RemoveRegionEvent e){
-        for (RemoveRegionListener listener: removeRegionListeners){
+
+    public void call(RemoveRegionEvent e) {
+        for (RemoveRegionListener listener : removeRegionListeners) {
             listener.accept(e);
         }
     }
+
     public void call(AddRegionMembersEvent e) {
-        for (AddRegionMembersListener listener: addRegionMembersListeners){
+        for (AddRegionMembersListener listener : addRegionMembersListeners) {
             listener.accept(e);
         }
     }
+
     public void call(RemoveRegionMembersEvent e) {
-        for (RemoveRegionMembersListener listener: removeRegionMembersListeners){
+        for (RemoveRegionMembersListener listener : removeRegionMembersListeners) {
             listener.accept(e);
         }
     }
-    public void call(AddRegionOwnersEvent e){
-        for (AddRegionOwnersListener listener: addRegionOwnerListeners){
+
+    public void call(AddRegionOwnersEvent e) {
+        for (AddRegionOwnersListener listener : addRegionOwnerListeners) {
             listener.accept(e);
         }
     }
+
     public void call(RemoveRegionOwnersEvent e) {
-        for (RemoveRegionOwnersListener listener: removeRegionOwnersListeners){
+        for (RemoveRegionOwnersListener listener : removeRegionOwnersListeners) {
             listener.accept(e);
         }
     }

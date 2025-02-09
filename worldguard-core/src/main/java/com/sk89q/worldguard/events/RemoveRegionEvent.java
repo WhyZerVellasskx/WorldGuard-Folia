@@ -28,7 +28,7 @@ public class RemoveRegionEvent {
     private final Set<ProtectedRegion> regions;
     private final RegionManager regionManager;
 
-    public RemoveRegionEvent(final Set<ProtectedRegion> regions, RegionManager regionManager){
+    public RemoveRegionEvent(final Set<ProtectedRegion> regions, RegionManager regionManager) {
         this.regions = regions;
         this.regionManager = regionManager;
     }
@@ -37,7 +37,7 @@ public class RemoveRegionEvent {
         return regionManager;
     }
 
-    public Set<ProtectedRegion> getRegions(){
+    public Set<ProtectedRegion> getRegions() {
         return this.regions;
     }
 }

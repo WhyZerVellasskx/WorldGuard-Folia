@@ -27,7 +27,8 @@ public class RemoveRegionOwnersEvent {
     private final ProtectedRegion region;
     private final DefaultDomain owners;
     private final RegionManager regionManager;
-    public RemoveRegionOwnersEvent(ProtectedRegion region, DefaultDomain owners, RegionManager regionManager){
+
+    public RemoveRegionOwnersEvent(ProtectedRegion region, DefaultDomain owners, RegionManager regionManager) {
         this.region = region;
         this.owners = owners;
         this.regionManager = regionManager;

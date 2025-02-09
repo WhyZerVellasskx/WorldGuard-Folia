@@ -25,5 +25,5 @@ import com.sk89q.worldguard.events.AddRegionOwnersEvent;
  * Add region owners event listener
  */
 public interface AddRegionOwnersListener {
-    void accept(AddRegionOwnersEvent e);
+    void accept(AddRegionOwnersEvent event);
 }
