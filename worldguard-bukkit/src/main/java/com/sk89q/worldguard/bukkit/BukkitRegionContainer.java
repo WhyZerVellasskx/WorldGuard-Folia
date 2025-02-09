@@ -128,5 +128,4 @@ public class BukkitRegionContainer extends RegionContainer {
 
         return manager;
     }
-
 }
