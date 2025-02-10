@@ -692,8 +692,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                     return;
                 }
             }
-            final RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer()
-                    .get(world);
+            final RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
             ApplicableRegionSet regions;
             if (regionManager == null) {
                 regions = FailedLoadRegionSet.getInstance();
@@ -715,8 +714,8 @@ public class WorldGuardEntityListener extends AbstractListener {
                 if (localPlayer != null && !cause.isIndirect()) {
                     // NB there is no way to cancel the teleport without PTA (since PlayerPortal doesn't have block info)
                     // removing PTA was a mistake
-                    String message = regions.queryValue(localPlayer, Flags.DENY_MESSAGE);
-                    RegionProtectionListener.formatAndSendDenyMessage("create portals", localPlayer, message);
+                    String message = getConfig().denyCreatePortal;
+                    RegionProtectionListener.componentFormatAndSendDenyMessage(((Player) cause.getRootCause()).getPlayer(), message);
                 }
                 event.setCancelled(true);
             }

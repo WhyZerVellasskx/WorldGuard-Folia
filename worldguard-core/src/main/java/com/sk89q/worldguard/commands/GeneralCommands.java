@@ -68,7 +68,7 @@ public class GeneralCommands {
                 if (player.equals(sender)) {
                     player.print("God mode enabled! Use /ungod to disable.");
 
-                    // Keep track of this
+                    // Keep track of thisb
                     included = true;
                 } else if (!args.hasFlag('s')) {
                     player.print("God enabled by " + sender.getDisplayName() + ".");

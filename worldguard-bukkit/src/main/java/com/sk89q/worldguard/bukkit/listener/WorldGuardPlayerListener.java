@@ -39,6 +39,7 @@ import com.sk89q.worldguard.session.handler.GameModeFlag;
 import com.sk89q.worldguard.util.Entities;
 import com.sk89q.worldguard.util.command.CommandFilter;
 import com.sk89q.worldguard.util.profile.Profile;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -146,8 +147,8 @@ public class WorldGuardPlayerListener extends AbstractListener {
             ApplicableRegionSet chatFrom = query.getApplicableRegions(localPlayer.getLocation());
 
             if (!chatFrom.testState(localPlayer, Flags.SEND_CHAT)) {
-                String message = chatFrom.queryValue(localPlayer, Flags.DENY_MESSAGE);
-                RegionProtectionListener.formatAndSendDenyMessage("chat", localPlayer, message);
+                String message = getConfig().denyChatMessage;
+                RegionProtectionListener.componentFormatAndSendDenyMessage(player, message);
                 event.setCancelled(true);
                 return;
             }
@@ -429,8 +430,12 @@ public class WorldGuardPlayerListener extends AbstractListener {
             CommandFilter test = new CommandFilter(allowedCommands, blockedCommands);
 
             if (!test.apply(event.getMessage())) {
-                String message = set.queryValue(localPlayer, Flags.DENY_MESSAGE);
-                RegionProtectionListener.formatAndSendDenyMessage("use " + event.getMessage(), localPlayer, message);
+                String message = getConfig().denyUseCommand;
+                RegionProtectionListener.componentFormatAndSendDenyMessage(
+                        player,
+                        message,
+                        Placeholder.unparsed("command", event.getMessage())
+                );
                 event.setCancelled(true);
                 return;
             }

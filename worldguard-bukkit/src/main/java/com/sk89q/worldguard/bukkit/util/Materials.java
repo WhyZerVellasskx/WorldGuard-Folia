@@ -929,12 +929,12 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.PALE_HANGING_MOSS, 0);
         MATERIAL_FLAGS.put(Material.PALE_MOSS_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.CREAKING_HEART, 0);
-        MATERIAL_FLAGS.put(Material.RESIN_CLUMP, 0);
-        MATERIAL_FLAGS.put(Material.RESIN_BLOCK, 0);
-        MATERIAL_FLAGS.put(Material.RESIN_BRICKS, 0);
-        MATERIAL_FLAGS.put(Material.CHISELED_RESIN_BRICKS, 0);
+//        MATERIAL_FLAGS.put(Material.RESIN_CLUMP, 0);
+//        MATERIAL_FLAGS.put(Material.RESIN_BLOCK, 0);
+//        MATERIAL_FLAGS.put(Material.RESIN_BRICKS, 0);
+//        MATERIAL_FLAGS.put(Material.CHISELED_RESIN_BRICKS, 0);
         MATERIAL_FLAGS.put(Material.MACE, 0);
-        MATERIAL_FLAGS.put(Material.RESIN_BRICK, 0);
+    //    MATERIAL_FLAGS.put(Material.RESIN_BRICK, 0);
 
         Stream.concat(Stream.concat(
                 Tag.CORAL_BLOCKS.getValues().stream(),

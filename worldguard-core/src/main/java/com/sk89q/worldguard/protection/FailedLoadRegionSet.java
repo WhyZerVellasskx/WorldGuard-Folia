@@ -61,8 +61,6 @@ public class FailedLoadRegionSet extends AbstractRegionSet {
     public <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag) {
         if (flag == Flags.BUILD) {
             return (V) State.DENY;
-        } else if (flag == Flags.DENY_MESSAGE) {
-            return (V) denyMessage;
         }
         return flag.getDefault();
     }
@@ -85,8 +83,6 @@ public class FailedLoadRegionSet extends AbstractRegionSet {
     public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
         if (flag == Flags.BUILD) {
             return (Collection<V>) ImmutableList.of(State.DENY);
-        } else if (flag == Flags.DENY_MESSAGE) {
-            return (Collection<V>) denyMessageCollection;
         }
         V fallback = flag.getDefault();
         return fallback != null ? ImmutableList.of(fallback) : (Collection<V>) ImmutableList.of();

@@ -302,7 +302,6 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
         setParentOnClaim = getString("regions.set-parent-on-claim", "");
         boundedLocationFlags = getBoolean("regions.location-flags-only-inside-regions", false);
-
         maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player.default", 7);
         maxRegionCounts = new HashMap<>();
         maxRegionCounts.put(null, maxRegionCountPerPlayer);

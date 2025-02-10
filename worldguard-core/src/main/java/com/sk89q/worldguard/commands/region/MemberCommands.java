@@ -25,21 +25,25 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.DomainInputResolver;
 import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.concurrent.Callable;
 
 public class MemberCommands extends RegionCommandsBase {
 
     private final WorldGuard worldGuard;
+    private final ConfigurationManager config = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
 
     public MemberCommands(WorldGuard worldGuard) {
         this.worldGuard = worldGuard;
@@ -52,6 +56,7 @@ public class MemberCommands extends RegionCommandsBase {
             min = 2)
     public void addMember(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
+        Player player = Bukkit.getPlayer(sender.getName()); //unsafe get player
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
@@ -69,12 +74,23 @@ public class MemberCommands extends RegionCommandsBase {
         resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
 
 
+
         final String description = String.format("Adding members to the region '%s' on '%s'", region.getId(), world.getName());
         AsyncCommandBuilder.wrap(resolver, sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
-                .onSuccess(String.format("Region '%s' updated with new members.", region.getId()), region.getMembers()::addAll)
+                .onSuccess(
+                        (String) null,
+                        result -> {
+                            region.getMembers().addAll(result);
+                            player.sendRichMessage(
+                                    config.addMemberMessage,
+                                    Placeholder.unparsed("region", region.getId())
+                            );
+                        }
+                )
                 .onFailure("Failed to add new members", worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
+
     }
 
     @Command(aliases = {"addowner", "addowner", "ao"},
@@ -84,6 +100,7 @@ public class MemberCommands extends RegionCommandsBase {
             min = 2)
     public void addOwner(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
+        Player player = Bukkit.getPlayer(sender.getName()); //unsafe get player
 
         World world = checkWorld(args, sender, 'w'); // Get the world
 
@@ -106,7 +123,16 @@ public class MemberCommands extends RegionCommandsBase {
         final String description = String.format("Adding owners to the region '%s' on '%s'", region.getId(), world.getName());
         AsyncCommandBuilder.wrap(checkedAddOwners(sender, manager, region, world, resolver), sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
-                .onSuccess(String.format("Region '%s' updated with new owners.", region.getId()), region.getOwners()::addAll)
+                .onSuccess(
+                        (String) null,
+                        result -> {
+                            region.getOwners().addAll(result);
+                            player.sendRichMessage(
+                                    config.addOwnerMessage,
+                                    Placeholder.unparsed("region", region.getId())
+                            );
+                        }
+                )
                 .onFailure("Failed to add new owners", worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
     }
@@ -151,6 +177,7 @@ public class MemberCommands extends RegionCommandsBase {
             min = 1)
     public void removeMember(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
+        Player player = Bukkit.getPlayer(sender.getName()); //unsafe get player
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
@@ -182,7 +209,16 @@ public class MemberCommands extends RegionCommandsBase {
         AsyncCommandBuilder.wrap(callable, sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .onSuccess(String.format("Region '%s' updated with members removed.", region.getId()), region.getMembers()::removeAll)
+                .onSuccess(
+                        (String) null,
+                        result -> {
+                            region.getMembers().removeAll(result);
+                            player.sendRichMessage(
+                                    config.removeMemberMessage,
+                                    Placeholder.unparsed("region", region.getId())
+                            );
+                        }
+                )
                 .onFailure("Failed to remove members", worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
     }
@@ -194,6 +230,7 @@ public class MemberCommands extends RegionCommandsBase {
             min = 1)
     public void removeOwner(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
+        Player player = Bukkit.getPlayer(sender.getName()); //unsafe get player
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
@@ -225,7 +262,16 @@ public class MemberCommands extends RegionCommandsBase {
         AsyncCommandBuilder.wrap(callable, sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .onSuccess(String.format("Region '%s' updated with owners removed.", region.getId()), region.getOwners()::removeAll)
+                .onSuccess(
+                        (String) null,
+                        result -> {
+                            region.getOwners().removeAll(result);
+                            player.sendRichMessage(
+                                    config.removeOwnerMessage,
+                                    Placeholder.unparsed("region", region.getId())
+                            );
+                        }
+                )
                 .onFailure("Failed to remove owners", worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
     }

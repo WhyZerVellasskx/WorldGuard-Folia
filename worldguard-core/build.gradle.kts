@@ -20,6 +20,11 @@ dependencies {
     "compileOnlyApi"(libs.jsr305)
     "implementation"(libs.gson)
 
+    "compileOnly"(libs.paperApi) {
+        exclude("org.slf4j", "slf4j-api")
+        exclude("junit", "junit")
+    }
+
     "compileOnly"(libs.worldedit.libs.ap)
     "annotationProcessor"(libs.worldedit.libs.ap)
     // ensure this is on the classpath for the AP

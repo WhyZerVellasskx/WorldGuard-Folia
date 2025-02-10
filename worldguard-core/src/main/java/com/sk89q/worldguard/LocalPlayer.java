@@ -220,4 +220,9 @@ public interface LocalPlayer extends Player, RegionAssociable {
      * @param failMessage message to display on failure
      */
     void teleport(Location location, String successMessage, String failMessage);
+
+//    default void sendActionBar(String string) {
+//
+//    }
+
 }
