@@ -410,6 +410,10 @@ public class RegionProtectionListener extends AbstractListener {
             } else if (event.getOriginalEvent() instanceof InventoryOpenEvent) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
                 what = getConfig().denyOpenChest;
+            } else if (Entities.isMinecart(entity.getType())) {
+                canUse = true; //allow use vehicle in region
+                what = getConfig().denyOpenChest;
+
             } else {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
                 what = getConfig().denyChangeItemFrame;
