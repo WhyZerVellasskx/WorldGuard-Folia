@@ -67,6 +67,7 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         denyUseRespawnAnchor = config.getString("messages.deny-message.use-respawn-anchor", "Вы не можете использовать этот якорь возрождения");
         denyUseExplosives = config.getString("messages.deny-message.use-explosives", "Вы не можете использовать взрывчатку");
         denyUseItem = config.getString("messages.deny-message.use-item", "Вы не можете использовать этот предмет");
+        denyEat = config.getString("messages.deny-message.deny-eat", "<#FF3131>Вы не можете здесь есть этот предмет");
         denyPlaceVehicle = config.getString("messages.deny-message.place-vehicle", "Вы не можете поставить транспортное средство");
         denyDropItem = config.getString("messages.deny-message.drop-item", "Вы не можете выбросить этот предмет");
         denyDropXP = config.getString("messages.deny-message.drop-xp", "Вы не можете выбросить опыт");

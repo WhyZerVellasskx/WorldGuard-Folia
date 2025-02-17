@@ -93,6 +93,7 @@ public abstract class ConfigurationManager {
     public String denyUseRespawnAnchor;
     public String denyUseExplosives;
     public String denyUseItem;
+    public String denyEat;
     public String denyPlaceVehicle;
     public String denyDropItem;
     public String denyDropXP;

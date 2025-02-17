@@ -50,15 +50,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 
@@ -202,6 +194,24 @@ public class WorldGuardPlayerListener extends AbstractListener {
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerConsume(PlayerItemConsumeEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+
+        if (item.getType() == Material.CHORUS_FRUIT) {
+            LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+            RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+            ApplicableRegionSet setFrom = query.getApplicableRegions(localPlayer.getLocation());
+
+            if (!setFrom.testState(localPlayer, Flags.EAT_CHORUS_FRUIT)) {
+                String message = getConfig().denyEat;
+                RegionProtectionListener.componentFormatAndSendDenyMessage(player, message);
+                event.setCancelled(true);
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -211,6 +221,20 @@ public class WorldGuardPlayerListener extends AbstractListener {
             handleBlockRightClick(event);
         } else if (event.getAction() == Action.PHYSICAL) {
             handlePhysicalInteract(event);
+        }
+
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item.getType() == Material.ENDER_PEARL) {
+            LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+            RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+            ApplicableRegionSet setFrom = query.getApplicableRegions(localPlayer.getLocation());
+
+            if (!setFrom.testState(localPlayer, Flags.ENDERPEARL)) {
+                String message = getConfig().denyUseItem;
+                RegionProtectionListener.componentFormatAndSendDenyMessage(player, message);
+                event.setCancelled(true);
+                return;
+            }
         }
 
         ConfigurationManager cfg = getConfig();
@@ -226,6 +250,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
             }
         }
     }
+
 
     /**
      * Called when a player right clicks a block.
@@ -349,6 +374,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
         }
     }
 
+    @Deprecated(since = "not implement on folia")
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         if (event.getTo() == null) {
@@ -390,10 +416,10 @@ public class WorldGuardPlayerListener extends AbstractListener {
                 if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
                     boolean cancel = false;
                     String message = null;
-                    if (!setFrom.testState(localPlayer, Flags.CHORUS_TELEPORT)) {
+                    if (!setFrom.testState(localPlayer, Flags.EAT_CHORUS_FRUIT)) {
                         cancel = true;
                         message = setFrom.queryValue(localPlayer, Flags.EXIT_DENY_MESSAGE);
-                    } else if (!set.testState(localPlayer, Flags.CHORUS_TELEPORT)) {
+                    } else if (!set.testState(localPlayer, Flags.EAT_CHORUS_FRUIT)) {
                         cancel = true;
                         message = set.queryValue(localPlayer, Flags.ENTRY_DENY_MESSAGE);
                     }

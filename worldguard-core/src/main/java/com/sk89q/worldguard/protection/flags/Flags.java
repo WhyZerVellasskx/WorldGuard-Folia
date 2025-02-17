@@ -167,7 +167,7 @@ public final class Flags {
     public static final StateFlag EXIT_VIA_TELEPORT = register(new StateFlag("exit-via-teleport", true));
 
     public static final StateFlag ENDERPEARL = register(new StateFlag("enderpearl", true));
-    public static final StateFlag CHORUS_TELEPORT = register(new StateFlag("chorus-fruit-teleport", true));
+    public static final StateFlag EAT_CHORUS_FRUIT = register(new StateFlag("eat-chorus-fruit", true));
 
     /**
      * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
