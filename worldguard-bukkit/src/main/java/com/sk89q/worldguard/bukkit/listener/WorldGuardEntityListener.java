@@ -649,7 +649,8 @@ public class WorldGuardEntityListener extends AbstractListener {
 
         Location eventLoc = event.getLocation();
 
-        if (wcfg.useRegions && cfg.useRegionsCreatureSpawnEvent) {
+        //I do not know why cfg.useCreatureSpawnEvent stopped working.
+        if (wcfg.useRegions) {
             ApplicableRegionSet set =
                     WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(eventLoc));
 
@@ -664,7 +665,6 @@ public class WorldGuardEntityListener extends AbstractListener {
                 return;
             }
         }
-
         if (wcfg.blockGroundSlimes && entityType == EntityType.SLIME
                 && eventLoc.getY() >= 60
                 && event.getSpawnReason() == SpawnReason.NATURAL) {
