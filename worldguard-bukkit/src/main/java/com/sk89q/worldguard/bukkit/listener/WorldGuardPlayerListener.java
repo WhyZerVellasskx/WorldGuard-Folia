@@ -126,7 +126,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
         Events.fire(new ProcessPlayerEvent(player));
         WorldGuard.getInstance().getExecutorService().submit(() ->
-            WorldGuard.getInstance().getProfileCache().put(new Profile(player.getUniqueId(), player.getName())));
+                WorldGuard.getInstance().getProfileCache().put(new Profile(player.getUniqueId(), player.getName())));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -146,7 +146,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
             }
 
             boolean anyRemoved = false;
-            for (Iterator<Player> i = event.getRecipients().iterator(); i.hasNext();) {
+            for (Iterator<Player> i = event.getRecipients().iterator(); i.hasNext(); ) {
                 Player rPlayer = i.next();
                 LocalPlayer rLocal = getPlugin().wrapPlayer(rPlayer);
                 if (!query.testState(rLocal.getLocation(), rLocal, Flags.RECEIVE_CHAT)) {
@@ -179,7 +179,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
             if (!hostname.equals(hostKey)
                     && !(cfg.hostKeysAllowFMLClients &&
-                            (hostname.equals(hostKey + "\u0000FML\u0000") || hostname.equals(hostKey + "\u0000FML2\u0000")))) {
+                    (hostname.equals(hostKey + "\u0000FML\u0000") || hostname.equals(hostKey + "\u0000FML2\u0000")))) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
                         "You did not join with the valid host key!");
                 log.warning("WorldGuard host key check: " +
@@ -209,6 +209,23 @@ public class WorldGuardPlayerListener extends AbstractListener {
                 RegionProtectionListener.componentFormatAndSendDenyMessage(player, message);
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+
+        if (player.hasPermission("worldguard.bypass.flag.fly")) return;
+
+        LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+        RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+        ApplicableRegionSet setFrom = query.getApplicableRegions(localPlayer.getLocation());
+
+        if (!setFrom.testState(localPlayer, Flags.FLY)) {
+            String message = getConfig().denyFly;
+            RegionProtectionListener.componentFormatAndSendDenyMessage(player, message);
+            player.setAllowFlight(false);
         }
     }
 
@@ -293,7 +310,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
                     player.sendMessage(ChatColor.YELLOW + "Can you build? " + (set.testState(localPlayer, Flags.BUILD) ? "Yes" : "No"));
 
                     StringBuilder str = new StringBuilder();
-                    for (Iterator<ProtectedRegion> it = set.iterator(); it.hasNext();) {
+                    for (Iterator<ProtectedRegion> it = set.iterator(); it.hasNext(); ) {
                         str.append(it.next().getId());
                         if (it.hasNext()) {
                             str.append(", ");
