@@ -216,16 +216,16 @@ public class WorldGuardPlayerListener extends AbstractListener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (player.hasPermission("worldguard.bypass.flag.fly")) return;
-
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         ApplicableRegionSet setFrom = query.getApplicableRegions(localPlayer.getLocation());
 
         if (!setFrom.testState(localPlayer, Flags.FLY)) {
-            String message = getConfig().denyFly;
-            RegionProtectionListener.componentFormatAndSendDenyMessage(player, message);
-            player.setAllowFlight(false);
+            if (player.isFlying() && !player.hasPermission("worldguard.bypass.flag.fly")) {
+                String message = getConfig().denyFly;
+                RegionProtectionListener.componentFormatAndSendDenyMessage(player, message);
+                player.setAllowFlight(false);
+            }
         }
     }
 
