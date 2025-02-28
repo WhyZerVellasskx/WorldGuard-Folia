@@ -195,7 +195,7 @@ public class RegionProtectionListener extends AbstractListener {
                 event.setSilent(true); // gets spammy
                 canPlace = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.BLOCK_PLACE, Flags.FROSTED_ICE_FORM));
                 what = getConfig().denyPlaceFrostedIce; // hidden anyway
-            /* Everything else */
+                /* Everything else */
             } else {
                 canPlace = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.BLOCK_PLACE));
                 what = getConfig().denyPlaceBlock;
@@ -230,7 +230,7 @@ public class RegionProtectionListener extends AbstractListener {
                     canBreak = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.BLOCK_BREAK, Flags.TNT));
                     message = getConfig().useDynamite;
 
-                /* Everything else */
+                    /* Everything else */
                 } else {
                     canBreak = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.BLOCK_BREAK));
                     message = getConfig().denyBlockBreaks;
@@ -396,12 +396,18 @@ public class RegionProtectionListener extends AbstractListener {
 
         final Entity entity = event.getEntity();
         final EntityType type = entity.getType();
+
         if (Entities.isHostile(entity) || Entities.isAmbient(entity)
                 || Entities.isNPC(entity) || entity instanceof Player) {
             canUse = event.getRelevantFlags().isEmpty() || query.queryState(BukkitAdapter.adapt(target), associable, combine(event)) != State.DENY;
             what = getConfig().denyUseItem;
         } else if (Entities.isConsideredBuildingIfUsed(entity)
                 || event.getOriginalEvent() instanceof InventoryOpenEvent) {
+
+            if (Entities.isMinecart(type)) {
+                return;
+            }
+
             if ((type == EntityType.ITEM_FRAME || type == EntityType.GLOW_ITEM_FRAME)
                     && event.getCause().getFirstPlayer() != null
                     && ((ItemFrame) entity).getItem().getType() != Material.AIR) {
@@ -410,10 +416,6 @@ public class RegionProtectionListener extends AbstractListener {
             } else if (event.getOriginalEvent() instanceof InventoryOpenEvent) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
                 what = getConfig().denyOpenChest;
-            } else if (Entities.isMinecart(entity.getType())) {
-                canUse = true; //allow use vehicle in region
-                what = getConfig().denyOpenChest;
-
             } else {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
                 what = getConfig().denyChangeItemFrame;
